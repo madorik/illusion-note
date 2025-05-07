@@ -1,50 +1,67 @@
-# Welcome to your Expo app 👋
+# Illusion Note - 감정 일기 앱
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Illusion Note는 감정 일기를 작성하고 AI가 분석해주는 모바일 애플리케이션입니다.
 
-## Get started
+## 주요 기능
 
-1. Install dependencies
+- 사용자의 감정 기록
+- 감정에 따른 AI 분석 제공 (위로, 팩트, 조언 모드)
+- 감정 일기 저장 및 관리
 
-   ```bash
-   npm install
-   ```
+## 시작하기
 
-2. Start the app
+### 프론트엔드 (React Native/Expo)
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+1. 의존성 설치:
+```
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. 개발 서버 실행:
+```
+npm start
+```
 
-## Learn more
+3. Expo Go 앱으로 테스트:
+- iOS 또는 Android 기기에 Expo Go 앱을 설치
+- 개발 서버에서 제공하는 QR 코드를 스캔
 
-To learn more about developing your project with Expo, look at the following resources:
+### 백엔드 (FastAPI)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+1. 의존성 설치:
+```
+cd backend
+pip install -r requirements.txt
+```
 
-## Join the community
+2. 백엔드 서버 실행:
+```
+# Windows
+run_backend.bat
 
-Join our community of developers creating universal apps.
+# 또는 직접 실행
+cd backend
+python run.py
+```
+
+## 프로젝트 구조
+
+- `/app`: Expo Router 기반 앱 화면
+  - `/(tabs)`: 탭 기반 네비게이션 화면
+  - `/mood-input.tsx`: 감정 입력 화면
+  - `/journal-analysis.tsx`: 감정 분석 결과 화면
+
+- `/backend`: FastAPI 백엔드
+  - `/app/models`: 감정 분석 모델
+  - `/app/routes`: API 엔드포인트
+
+## API 엔드포인트
+
+- `POST /api/analyze`: 감정 분석 
+  - 요청 본문: `{ "text": "일기 내용", "mood_id": "감정 ID", "mode": "모드" }`
+  - 응답: `{ "detected_emotion": "감지된 감정", "summary": "요약", "response": "모드별 응답" }`
+
+# Welcome to your Expo app 👋
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
