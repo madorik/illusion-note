@@ -262,7 +262,7 @@ export default function SettingsScreen() {
         </View>
         
         <View style={styles.footer}>
-          <Text style={styles.footerText}>© 2023 감정 일기 앱</Text>
+          <Text style={styles.footerText}>© 2025 감정 일기 앱</Text>
         </View>
       </ScrollView>
     </View>
