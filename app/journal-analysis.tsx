@@ -1,3 +1,4 @@
+import { AppTabBar } from '@/components/ui/AppTabBar';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -122,20 +123,7 @@ export default function JournalAnalysisScreen() {
         </TouchableOpacity>
       </ScrollView>
 
-      <View style={styles.tabBar}>
-        <TouchableOpacity style={styles.tabItem} onPress={() => router.push('/(tabs)')}>
-          <IconSymbol name="house.fill" size={24} color="#8DABD3" />
-          <Text style={styles.tabText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem} onPress={() => router.push('/(tabs)/records')}>
-          <IconSymbol name="book.fill" size={24} color="#8F9BB3" />
-          <Text style={styles.tabText}>Records</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem} onPress={() => router.push('/(tabs)/settings')}>
-          <IconSymbol name="gear" size={24} color="#8F9BB3" />
-          <Text style={styles.tabText}>Settings</Text>
-        </TouchableOpacity>
-      </View>
+      <AppTabBar activeTab="home" />
     </KeyboardAvoidingView>
   );
 }
@@ -158,11 +146,6 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2E3A59',
-  },
   headerRight: {
     width: 40,
   },
@@ -171,7 +154,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 20,
-    paddingBottom: 30,
+    paddingBottom: 80,
   },
   emotionContainer: {
     flexDirection: 'row',
@@ -266,20 +249,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  tabBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    borderTopWidth: 1,
-    borderTopColor: '#E8E8E8',
-    paddingVertical: 10,
-  },
-  tabItem: {
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  tabText: {
-    fontSize: 12,
-    marginTop: 4,
-    color: '#8F9BB3',
-  }
 }); 

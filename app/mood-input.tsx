@@ -1,3 +1,4 @@
+import { AppTabBar } from '@/components/ui/AppTabBar';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { router, Stack } from 'expo-router';
 import React, { useState } from 'react';
@@ -222,20 +223,7 @@ export default function MoodInputScreen() {
           <View style={styles.paddingView} />
         </KeyboardAwareScrollView>
 
-        <View style={styles.tabBar}>
-          <TouchableOpacity style={styles.tabItem} onPress={() => router.push('/(tabs)')}>
-            <IconSymbol name="house.fill" size={24} color="#8DABD3" />
-            <Text style={styles.tabText}>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.tabItem} onPress={() => router.push('/(tabs)/records')}>
-            <IconSymbol name="book.fill" size={24} color="#8F9BB3" />
-            <Text style={styles.tabText}>Records</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.tabItem} onPress={() => router.push('/(tabs)/settings')}>
-            <IconSymbol name="gear" size={24} color="#8F9BB3" />
-            <Text style={styles.tabText}>Settings</Text>
-          </TouchableOpacity>
-        </View>
+        <AppTabBar activeTab="home" />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -351,23 +339,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   paddingView: {
-    height: 100,  // 하단 여백
+    height: 120,  // 하단 여백 증가
   },
-  tabBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    borderTopWidth: 1,
-    borderTopColor: '#E8E8E8',
-    paddingVertical: 10,
-    backgroundColor: '#fff',
-  },
-  tabItem: {
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  tabText: {
-    fontSize: 12,
-    marginTop: 4,
-    color: '#8F9BB3',
-  }
 }); 

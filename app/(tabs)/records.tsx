@@ -13,6 +13,24 @@ import {
 
 // Mock data for journal entries
 const mockJournalEntries = {
+  '2025-05-03': [
+    { id: '7', title: '봄날의 산책', emotion: '행복', time: '11:30 AM' },
+    { id: '8', title: '오랜만의 여유', emotion: '평온', time: '04:45 PM' },
+  ],
+  '2025-05-10': [
+    { id: '9', title: '새 프로젝트 시작', emotion: '기대', time: '09:20 AM' },
+    { id: '10', title: '저녁 요리 도전', emotion: '기쁨', time: '07:30 PM' },
+  ],
+  '2025-05-15': [
+    { id: '11', title: '중요한 결정', emotion: '걱정', time: '03:15 PM' },
+  ],
+  '2025-05-22': [
+    { id: '12', title: '친구와의 갈등', emotion: '슬픔', time: '08:40 PM' },
+  ],
+  '2025-05-27': [
+    { id: '13', title: '문제 해결', emotion: '안도', time: '02:25 PM' },
+    { id: '14', title: '미래 계획', emotion: '희망', time: '10:10 PM' },
+  ],
   '2025-12-01': [
     { id: '1', title: '힘든 하루', emotion: '슬픔', time: '10:30 AM' },
     { id: '2', title: '친구와의 대화', emotion: '기쁨', time: '08:00 PM' },
