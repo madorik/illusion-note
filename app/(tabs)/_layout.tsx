@@ -24,16 +24,20 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#8DABD3',
+        tabBarInactiveTintColor: '#8F9BB3',
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
+        tabBarLabelStyle: {
+          fontSize: 10,
+        },
+        tabBarStyle: {
+          borderTopWidth: 1,
+          borderTopColor: '#E8E8E8',
+          backgroundColor: '#fff',
+          height: 50,
+          paddingBottom: Platform.OS === 'ios' ? 10 : 0,
+        },
       }}>
       <Tabs.Screen
         name="index"
@@ -53,14 +57,7 @@ export default function TabLayout() {
         name="stats"
         options={{
           title: '통계',
-          tabBarIcon: ({ color }) => <TabBarIcon name="chart.bar.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: '탐색',
-          tabBarIcon: ({ color }) => <TabBarIcon name="magnifyingglass" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="chart.line.uptrend.xyaxis.fill" color={color} />,
         }}
       />
       <Tabs.Screen

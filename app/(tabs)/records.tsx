@@ -1,22 +1,30 @@
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Animated,
+  Dimensions,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 
 // Mock data for journal entries
 const mockJournalEntries = {
-  '2023-12-01': [
+  '2025-12-01': [
     { id: '1', title: '힘든 하루', emotion: '슬픔', time: '10:30 AM' },
     { id: '2', title: '친구와의 대화', emotion: '기쁨', time: '08:00 PM' },
   ],
-  '2023-12-05': [
+  '2025-12-05': [
     { id: '3', title: '시험 준비', emotion: '불안', time: '04:15 PM' },
   ],
-  '2023-12-10': [
+  '2025-12-10': [
     { id: '4', title: '가족 모임', emotion: '행복', time: '01:00 PM' },
     { id: '5', title: '생각 정리', emotion: '평온', time: '10:45 PM' },
   ],
-  '2023-12-15': [
+  '2025-12-15': [
     { id: '6', title: '새로운 계획', emotion: '기대', time: '09:30 AM' },
   ],
 };
@@ -70,6 +78,8 @@ export default function RecordsScreen() {
   const [selectedDate, setSelectedDate] = useState(getCurrentDate());
   const [calendarDays, setCalendarDays] = useState([]);
   const [selectedEntries, setSelectedEntries] = useState([]);
+  const [isCalendarExpanded, setIsCalendarExpanded] = useState(true);
+  const calendarHeight = new Animated.Value(isCalendarExpanded ? 1 : 0);
   
   useEffect(() => {
     const days = generateCalendarDates(selectedYear, selectedMonth);
@@ -135,6 +145,16 @@ export default function RecordsScreen() {
       </View>
     </TouchableOpacity>
   );
+  
+  const toggleCalendar = () => {
+    const toValue = isCalendarExpanded ? 0 : 1;
+    Animated.timing(calendarHeight, {
+      toValue,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+    setIsCalendarExpanded(!isCalendarExpanded);
+  };
 
   return (
     <View style={styles.container}>
@@ -143,79 +163,120 @@ export default function RecordsScreen() {
       </View>
       
       <View style={styles.content}>
-        {/* Calendar Header */}
+        {/* Calendar Header with Toggle */}
         <View style={styles.calendarHeader}>
-          <TouchableOpacity onPress={() => navigateMonth('prev')}>
-            <IconSymbol name="chevron.left" size={24} color="#2E3A59" />
-          </TouchableOpacity>
-          <Text style={styles.monthTitle}>{selectedYear}년 {selectedMonth}월</Text>
-          <TouchableOpacity onPress={() => navigateMonth('next')}>
-            <IconSymbol name="chevron.right" size={24} color="#2E3A59" />
-          </TouchableOpacity>
-        </View>
-        
-        {/* Weekday Headers */}
-        <View style={styles.weekdayRow}>
-          {WEEKDAYS.map((day, index) => (
-            <View key={index} style={styles.weekdayCell}>
-              <Text style={[
-                styles.weekdayText,
-                index === 0 ? styles.sundayText : null,
-                index === 6 ? styles.saturdayText : null
-              ]}>
-                {day}
-              </Text>
-            </View>
-          ))}
-        </View>
-        
-        {/* Calendar Grid */}
-        <View style={styles.calendarGrid}>
-          {calendarDays.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.dayCell,
-                selectedDate === item.date ? styles.selectedDayCell : null,
-                !item.day ? styles.emptyCell : null
-              ]}
-              onPress={() => item.day ? selectDate(item.date) : null}
-              disabled={!item.day}
-            >
-              {item.day ? (
-                <>
-                  <Text style={[
-                    styles.dayText,
-                    selectedDate === item.date ? styles.selectedDayText : null,
-                    index % 7 === 0 ? styles.sundayText : null,
-                    index % 7 === 6 ? styles.saturdayText : null
-                  ]}>
-                    {item.day}
-                  </Text>
-                  {item.hasEntries && (
-                    <View style={styles.entryDot} />
-                  )}
-                </>
-              ) : null}
+          <View style={styles.calendarHeaderRow}>
+            <TouchableOpacity onPress={() => navigateMonth('prev')}>
+              <IconSymbol name="chevron.left" size={24} color="#2E3A59" />
             </TouchableOpacity>
-          ))}
+            <Text style={styles.monthTitle}>{selectedYear}년 {selectedMonth}월</Text>
+            <TouchableOpacity onPress={() => navigateMonth('next')}>
+              <IconSymbol name="chevron.right" size={24} color="#2E3A59" />
+            </TouchableOpacity>
+          </View>
         </View>
         
-        {/* Journal Entries List */}
-        <View style={styles.entriesContainer}>
-          <Text style={styles.entriesTitle}>
-            {selectedDate.split('-')[1]}월 {selectedDate.split('-')[2]}일의 기록
-          </Text>
+        <Animated.View style={[
+          styles.calendarContainer,
+          {
+            maxHeight: calendarHeight.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, 260]
+            }),
+            opacity: calendarHeight,
+            overflow: 'hidden'
+          }
+        ]}>
+          {/* Weekday Headers */}
+          <View style={styles.weekdayRow}>
+            {WEEKDAYS.map((day, index) => (
+              <View key={index} style={styles.weekdayCell}>
+                <Text style={[
+                  styles.weekdayText,
+                  index === 0 ? styles.sundayText : null,
+                  index === 6 ? styles.saturdayText : null
+                ]}>
+                  {day}
+                </Text>
+              </View>
+            ))}
+          </View>
           
-          {selectedEntries.length > 0 ? (
-            <FlatList
-              data={selectedEntries}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.entriesList}
-              showsVerticalScrollIndicator={false}
+          {/* Calendar Grid */}
+          <View style={styles.calendarGrid}>
+            {calendarDays.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.dayCell,
+                  selectedDate === item.date ? styles.selectedDayCell : null,
+                  !item.day ? styles.emptyCell : null
+                ]}
+                onPress={() => item.day ? selectDate(item.date) : null}
+                disabled={!item.day}
+              >
+                {item.day ? (
+                  <>
+                    <Text style={[
+                      styles.dayText,
+                      selectedDate === item.date ? styles.selectedDayText : null,
+                      index % 7 === 0 ? styles.sundayText : null,
+                      index % 7 === 6 ? styles.saturdayText : null
+                    ]}>
+                      {item.day}
+                    </Text>
+                    {item.hasEntries && (
+                      <View style={styles.entryDot} />
+                    )}
+                  </>
+                ) : null}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Animated.View>
+        
+        {/* Divider with Toggle Button */}
+        <View style={styles.dividerContainer}>
+          <View style={styles.dividerLine} />
+          <TouchableOpacity 
+            style={styles.toggleButton} 
+            onPress={toggleCalendar}
+          >
+            <Text style={styles.toggleText}>
+              {isCalendarExpanded ? '접기' : '펼치기'}
+            </Text>
+            <IconSymbol 
+              name="chevron.left" 
+              size={18} 
+              color="#8DABD3" 
+              style={{ 
+                transform: [{ rotate: isCalendarExpanded ? '90deg' : '-90deg' }], 
+                marginLeft: 4 
+              }}
             />
-          ) : (
+          </TouchableOpacity>
+          <View style={styles.dividerLine} />
+        </View>
+        
+        {/* Journal Entries List - Now Scrollable */}
+        {selectedEntries.length > 0 ? (
+          <FlatList
+            ListHeaderComponent={() => (
+              <Text style={styles.entriesTitle}>
+                {selectedDate.split('-')[1]}월 {selectedDate.split('-')[2]}일의 기록
+              </Text>
+            )}
+            data={selectedEntries}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.entriesList}
+            showsVerticalScrollIndicator={false}
+          />
+        ) : (
+          <View style={styles.entriesContainer}>
+            <Text style={styles.entriesTitle}>
+              {selectedDate.split('-')[1]}월 {selectedDate.split('-')[2]}일의 기록
+            </Text>
             <View style={styles.emptyState}>
               <IconSymbol name="doc.text" size={40} color="#8F9BB3" />
               <Text style={styles.emptyText}>이 날에는 기록이 없습니다.</Text>
@@ -226,8 +287,8 @@ export default function RecordsScreen() {
                 <Text style={styles.createButtonText}>새 기록 작성하기</Text>
               </TouchableOpacity>
             </View>
-          )}
-        </View>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -255,10 +316,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   calendarHeader: {
+    marginBottom: 16,
+  },
+  calendarHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
   },
   monthTitle: {
     fontSize: 18,
@@ -289,9 +352,7 @@ const styles = StyleSheet.create({
   calendarGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
-    paddingBottom: 20,
+    paddingBottom: 8,
   },
   dayCell: {
     width: DAY_SIZE,
@@ -324,16 +385,16 @@ const styles = StyleSheet.create({
   },
   entriesContainer: {
     flex: 1,
-    marginTop: 20,
   },
   entriesTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#2E3A59',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   entriesList: {
-    paddingBottom: 20,
+    paddingBottom: 40,
+    flex: 1,
   },
   entryItem: {
     backgroundColor: '#FFFFFF',
@@ -379,15 +440,16 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 30,
+    justifyContent: 'center',
+    paddingVertical: 40,
   },
   emptyText: {
     fontSize: 16,
     color: '#8F9BB3',
     marginTop: 12,
     marginBottom: 20,
+    textAlign: 'center',
   },
   createButton: {
     backgroundColor: '#8DABD3',
@@ -399,5 +461,40 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  calendarContainer: {
+    marginBottom: 16,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 16,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#F5F5F5',
+  },
+  toggleButton: {
+    width: 90,
+    height: 30,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 2,
+    flexDirection: 'row',
+    marginHorizontal: 10,
+  },
+  toggleText: {
+    fontSize: 13,
+    color: '#8DABD3',
+    fontWeight: '500',
   },
 }); 
