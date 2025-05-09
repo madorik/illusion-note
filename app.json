@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "illusion-note",
+    "slug": "illusion-note",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "illusionnote",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "owner": "mgjeong",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mgjeong.illusionnote",
+      "googleServicesFile": "./GoogleService-Info.plist"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.mg.illusion",
+      "googleServicesFile": "./google-services.json",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      "expo-secure-store",
+      "expo-web-browser",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "scopes": ["profile", "email"],
+          "webClientId": "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
+          "iosUrlScheme": "com.googleusercontent.apps.YOUR_IOS_CLIENT_ID"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "illusion-note"
+      },
+      "router": {}
+    }
+  }
+}
