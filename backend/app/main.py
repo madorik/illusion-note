@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from app.routes import emotion_route
+from app.routes import emotion_route, openai_route
 import os
 from dotenv import load_dotenv
 
@@ -19,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(emotion_route.router)
+app.include_router(openai_route.router)
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
