@@ -1,6 +1,8 @@
+import { useAuth } from '@/hooks/useAuth';
 import { router, Stack } from 'expo-router';
-import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const GoogleIcon = () => (
   <View style={styles.googleIconContainer}>
@@ -9,6 +11,44 @@ const GoogleIcon = () => (
 );
 
 export default function LoginScreen() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+
+  // Handle Google login via WebBrowser
+  const handleGoogleLogin = async () => {
+    try {
+      setIsLoading(true);
+      
+      // expo-web-browser를 사용하여 브라우저에서 Google 로그인 열기
+      const result = await WebBrowser.openBrowserAsync(
+        'https://illusion-note-api.vercel.app/api/auth/google',
+        {
+          presentationStyle: WebBrowser.WebBrowserPresentationStyle.FORM_SHEET,
+        }
+      );
+      
+      if (result.type === 'opened') {
+        // 브라우저가 열림 - 실제 구현에서는 딥링크나 다른 방법으로 토큰을 받아야 함
+        Alert.alert('알림', 'Google 로그인을 진행해주세요.');
+      }
+      
+      // Mock 로그인 처리 (실제 구현에서는 서버에서 토큰을 받아 처리)
+      await login();
+      router.push('/(tabs)');
+      
+    } catch (error) {
+      console.error('Google login error:', error);
+      Alert.alert('오류', 'Google 로그인에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle guest login
+  const handleGuestLogin = () => {
+    router.push('/(tabs)');
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
@@ -31,9 +71,14 @@ export default function LoginScreen() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.socialButton}
-          onPress={() => router.push('/(tabs)')}
+          onPress={handleGoogleLogin}
+          disabled={isLoading}
         >
-          <GoogleIcon />
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#DB4437" style={{ marginRight: 12 }} />
+          ) : (
+            <GoogleIcon />
+          )}
           <Text style={styles.buttonText}>Google로 로그인</Text>
         </TouchableOpacity>
 
@@ -45,7 +90,8 @@ export default function LoginScreen() {
 
         <TouchableOpacity 
           style={styles.guestButton}
-          onPress={() => router.push('/(tabs)')}
+          onPress={handleGuestLogin}
+          disabled={isLoading}
         >
           <Text style={styles.guestButtonText}>로그인 없이 시작</Text>
         </TouchableOpacity>

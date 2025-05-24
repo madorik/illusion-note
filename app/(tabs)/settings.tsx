@@ -1,8 +1,10 @@
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { useAuth } from '@/hooks/useAuth.tsx';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
     Alert,
+    Image,
     Linking,
     Modal,
     ScrollView,
@@ -18,6 +20,7 @@ export default function SettingsScreen() {
   const [darkMode, setDarkMode] = useState(false);
   const [appLock, setAppLock] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const { signOut, user, isSignedIn } = useAuth();
   
   // 로그아웃 처리
   const handleLogout = () => {
@@ -31,9 +34,8 @@ export default function SettingsScreen() {
         },
         {
           text: '로그아웃',
-          onPress: () => {
-            // 로그아웃 처리 로직
-            // 여기서는 예시로 로그인 페이지로 이동
+          onPress: async () => {
+            await signOut();
             router.replace('/login');
           }
         }
@@ -89,6 +91,24 @@ export default function SettingsScreen() {
       </View>
       
       <ScrollView style={styles.content}>
+        {/* 사용자 정보 섹션 */}
+        {isSignedIn && user && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>사용자 정보</Text>
+            <View style={styles.userInfo}>
+              {user.picture && (
+                <View style={styles.avatarContainer}>
+                  <Image source={{ uri: user.picture }} style={styles.avatar} />
+                </View>
+              )}
+              <View style={styles.userDetails}>
+                <Text style={styles.userName}>{user.name}</Text>
+                <Text style={styles.userEmail}>{user.email}</Text>
+              </View>
+            </View>
+          </View>
+        )}
+        
         {/* 알림 섹션 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>알림</Text>
@@ -394,5 +414,38 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#F7F9FC',
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  avatarContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    overflow: 'hidden',
+    marginRight: 12,
+    backgroundColor: '#E4E9F2',
+  },
+  avatar: {
+    width: '100%',
+    height: '100%',
+  },
+  userDetails: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2E3A59',
+    marginBottom: 4,
+  },
+  userEmail: {
+    fontSize: 14,
+    color: '#8F9BB3',
   },
 }); 

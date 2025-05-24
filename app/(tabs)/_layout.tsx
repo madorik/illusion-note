@@ -1,63 +1,80 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Tabs, router } from 'expo-router';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
+import { useAuth } from '@/hooks/useAuth.tsx';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
  */
 function TabBarIcon(props: {
-  name: React.ComponentProps<typeof IconSymbol>['name'];
+  name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
 }) {
-  return <IconSymbol size={28} style={{ marginBottom: -3 }} {...props} />;
+  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-
+  const { isSignedIn, isLoading } = useAuth();
+  
+  // Check if user is authenticated when accessing protected routes
+  useEffect(() => {
+    // If not loading and not signed in, redirect to login
+    if (!isLoading && !isSignedIn) {
+      router.replace('/login');
+    }
+  }, [isLoading, isSignedIn]);
+  
+  // Show loading while checking auth status
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#5B86E5" />
+      </View>
+    );
+  }
+  
+  // Only render tabs if authenticated
+  if (!isSignedIn) {
+    return null;
+  }
+  
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#8DABD3',
-        tabBarInactiveTintColor: '#8F9BB3',
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarLabelStyle: {
-          fontSize: 10,
+        tabBarActiveTintColor: '#5B86E5',
+        // Tab bar hidden by default, will be shown via component options
+        tabBarStyle: { 
+          height: 60,
+          paddingBottom: 10,
         },
-        tabBarStyle: {
-          borderTopWidth: 1,
-          borderTopColor: '#E8E8E8',
-          backgroundColor: '#fff',
-          height: 50,
-          paddingBottom: Platform.OS === 'ios' ? 10 : 0,
-        },
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
           title: '홈',
-          tabBarIcon: ({ color }) => <TabBarIcon name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
         name="records"
         options={{
           title: '기록',
-          tabBarIcon: ({ color }) => <TabBarIcon name="book.fill" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
           title: '통계',
-          tabBarIcon: ({ color }) => <TabBarIcon name="chart.line.uptrend.xyaxis.fill" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="bar-chart" color={color} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -65,6 +82,7 @@ export default function TabLayout() {
         options={{
           title: '설정',
           tabBarIcon: ({ color }) => <TabBarIcon name="gear" color={color} />,
+          headerShown: false,
         }}
       />
     </Tabs>
