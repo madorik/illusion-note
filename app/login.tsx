@@ -1,6 +1,5 @@
 import { useAuth } from '@/hooks/useAuth';
 import { router, Stack } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -14,31 +13,18 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
-  // Handle Google login via WebBrowser
+  // Handle Google login via Firebase
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
       
-      // expo-web-browser를 사용하여 브라우저에서 Google 로그인 열기
-      const result = await WebBrowser.openBrowserAsync(
-        'https://illusion-note-api.vercel.app/api/auth/google',
-        {
-          presentationStyle: WebBrowser.WebBrowserPresentationStyle.FORM_SHEET,
-        }
-      );
-      
-      if (result.type === 'opened') {
-        // 브라우저가 열림 - 실제 구현에서는 딥링크나 다른 방법으로 토큰을 받아야 함
-        Alert.alert('알림', 'Google 로그인을 진행해주세요.');
-      }
-      
-      // Mock 로그인 처리 (실제 구현에서는 서버에서 토큰을 받아 처리)
+      // useAuth 훅의 login 함수 호출 (실제 Google Sign-In)
       await login();
       router.push('/(tabs)');
       
     } catch (error) {
       console.error('Google login error:', error);
-      Alert.alert('오류', 'Google 로그인에 실패했습니다.');
+      Alert.alert('로그인 실패', 'Google 로그인에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }

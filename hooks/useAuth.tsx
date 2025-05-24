@@ -1,4 +1,10 @@
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+
+// Google Sign-In 설정
+GoogleSignin.configure({
+  webClientId: '360964278077-hr6nu21t8uuug5kurvbsdlcdjtmukrm8.apps.googleusercontent.com', // Firebase console에서 가져온 웹 클라이언트 ID
+});
 
 // Auth 컨텍스트 타입 정의
 interface AuthContextType {
@@ -14,6 +20,7 @@ interface User {
   id: string;
   email: string;
   name: string;
+  photo?: string;
 }
 
 // Auth 컨텍스트 생성
@@ -27,17 +34,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 앱 시작 시 인증 상태 확인
   useEffect(() => {
-    // 여기서 저장된 토큰이나 인증 정보를 확인할 수 있습니다
-    // 예: AsyncStorage에서 토큰 확인
     checkAuthStatus();
   }, []);
 
   const checkAuthStatus = async () => {
     try {
-      // 실제 구현에서는 저장된 토큰을 확인하고 서버에 검증 요청을 보냅니다
-      // 현재는 간단한 mock 구현
-      setIsLoading(false);
+      const isSignedIn = await GoogleSignin.isSignedIn();
+      if (isSignedIn) {
+        const userInfo = await GoogleSignin.getCurrentUser();
+        if (userInfo) {
+          setUser({
+            id: userInfo.user.id,
+            email: userInfo.user.email,
+            name: userInfo.user.name || '',
+            photo: userInfo.user.photo || undefined,
+          });
+          setIsAuthenticated(true);
+        }
+      }
     } catch (error) {
+      console.error('Auth status check failed:', error);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -45,20 +62,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async () => {
     try {
       setIsLoading(true);
-      // 실제 로그인 로직 구현
-      // 예: Google 로그인, 이메일/비밀번호 로그인 등
       
-      // Mock 사용자 데이터
-      const mockUser: User = {
-        id: '1',
-        email: 'user@example.com',
-        name: 'User Name'
-      };
+      // Google Play Services 확인
+      await GoogleSignin.hasPlayServices();
       
-      setUser(mockUser);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error('Login failed:', error);
+      // Google 로그인 시작
+      const userInfo = await GoogleSignin.signIn();
+      
+      if (userInfo) {
+        setUser({
+          id: userInfo.user.id,
+          email: userInfo.user.email,
+          name: userInfo.user.name || '',
+          photo: userInfo.user.photo || undefined,
+        });
+        setIsAuthenticated(true);
+      }
+    } catch (error: any) {
+      console.error('Google login failed:', error);
+      
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log('User cancelled the login flow');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        console.log('Sign in is in progress already');
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        console.log('Play services not available');
+      } else {
+        console.log('Some other error happened');
+      }
+      
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -67,9 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       setIsLoading(true);
-      // 실제 로그아웃 로직 구현
-      // 예: 토큰 삭제, 서버에 로그아웃 요청 등
-      
+      await GoogleSignin.signOut();
       setUser(null);
       setIsAuthenticated(false);
     } catch (error) {
